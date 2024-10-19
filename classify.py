@@ -5,8 +5,8 @@ from sklearn.metrics.pairwise import euclidean_distances
 import numpy as np
 
 # Spotify API credentials
-client_id = 'bb16ba341c7a412698de2a2c723c86ca'  # Replace with your actual client ID
-client_secret = 'c214bfe80def455688064f82d063f9a9'  # Replace with your actual client secret
+client_id = 'bb16ba341c7a412698de2a2c723c86ca'  
+client_secret = 'c214bfe80def455688064f82d063f9a9'  
 
 # Authenticate Spotify API
 sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
@@ -31,8 +31,7 @@ def get_related_artists(start_artist_name, num_artists=10):
     artist_names = [start_artist_name] + [artist['name'] for artist in related_artists[:num_artists-1]]
     return artist_names
 
-# Fetch artist data dynamically by starting from one artist and fetching related artists
-start_artist = "Kanye West"  # Starting point for fetching related artists
+start_artist = "Kanye West"  
 artist_names = get_related_artists(start_artist, num_artists=20)  # Fetch 20 related artists
 
 # Collect data for the selected artists
@@ -43,7 +42,6 @@ for artist in artist_names:
 # Create DataFrame
 df = pd.DataFrame(artist_data)
 
-# For simplicity, let's create one-hot encoding for genre
 all_genres = sorted(list(set([genre for sublist in df['genres'] for genre in sublist])))
 for genre in all_genres:
     df[genre] = df['genres'].apply(lambda x: 1 if genre in x else 0)
@@ -58,10 +56,8 @@ features = all_genres + ['popularity', 'followers']
 # Calculate the Euclidean distance between artists
 distance_matrix = euclidean_distances(df[features])
 
-# Convert to DataFrame for easier interpretation
 distance_df = pd.DataFrame(distance_matrix, index=df['name'].str.lower(), columns=df['name'].str.lower())  # Ensure lower case for consistency
 
-# Function to get top N similar artists for a query artist
 def get_similar_artists(query_artist, top_n=10):
     query_artist_lower = query_artist.lower()  # Convert to lower case for matching
     if query_artist_lower not in distance_df.columns:
@@ -71,10 +67,8 @@ def get_similar_artists(query_artist, top_n=10):
     distances = distance_df[query_artist_lower].sort_values()
     return distances.index[1:top_n+1]  # Exclude the first one since it's the same artist
 
-# Check which artists are in the dataset
 print("Artists in dataset:", distance_df.index)
 
-# Specify the query artists for whom you want the top 10 similar artists
 query_artists = ["Kanye West", "Drake", "Lil Wayne"]
 
 # Output top 10 similar artists for each query artist
